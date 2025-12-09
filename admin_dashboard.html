@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+<script src="data.js"></script>
+
+<style>
+  body {
+    font-family: Poppins, sans-serif;
+    background: linear-gradient(135deg, #dbe4f4, #c5d4ec, #aebfdc);
+    margin: 0;
+    padding-bottom: 60px;
+  }
+
+  .banner {
+  width: 100%;
+  padding: 22px 60px 22px 22px; /* space for logout */
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: white;
+  background: rgba(37, 70, 235, 0.9); /* admin color (blue) */
+  backdrop-filter: blur(14px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  border-bottom: 2px solid rgba(15,23,42,0.4);
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.logout-btn {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 999px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+
+    width: auto !important;
+    margin-top: 0 !important;
+  }
+
+  .section {
+    width: 80%;
+    max-width: 900px;
+    margin: 22px auto;
+    padding: 22px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.24);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.75);
+  }
+
+  .section h2 {
+    margin-top: 0;
+    color: #0f172a;
+    font-size: 21px;
+  }
+
+  input, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
+
+  input {
+    border: 1px solid #93c5fd;
+    background: rgba(255,255,255,0.8);
+  }
+
+  button {
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #1d4ed8;
+  }
+
+  table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  th {
+    background: #2563eb;
+    color: white;
+  }
+</style>
+
+</head>
+<body>
+
+<div class="banner">
+  Student Record Management System — Admin Panel
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<!-- ADD / UPDATE -->
+<div class="section">
+  <h2>Add / Update Student (with Login)</h2>
+
+  <input id="uName" type="text" placeholder="Student Username (login)">
+  <input id="uPass" type="text" placeholder="Student Password (login)">
+  <input id="roll" type="number" placeholder="Roll No">
+  <input id="name" type="text" placeholder="Name">
+  <input id="dept" type="text" placeholder="Department">
+  <input id="perf" type="number" placeholder="Performance (0-100)">
+  
+  <button onclick="addOrUpdate()">Save</button>
+</div>
+
+<!-- SEARCH -->
+<div class="section">
+  <h2>Search Student</h2>
+
+  <input id="searchKey" type="text" placeholder="Search by roll, name or department">
+  <button onclick="searchStudent()">Search</button>
+
+  <p id="searchResult"></p>
+</div>
+
+<!-- DELETE -->
+<div class="section">
+  <h2>Delete Student</h2>
+
+  <input id="deleteRoll" type="number" placeholder="Enter Roll No">
+  <button onclick="deleteStudent()">Delete</button>
+</div>
+
+<!-- DISPLAY -->
+<div class="section">
+  <h2>All Students</h2>
+  <button onclick="displayAll()">Refresh</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Roll</th>
+        <th>Name</th>
+        <th>Dept</th>
+        <th>Performance</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<script>
+  function ensureAdmin() {
+    if (localStorage.getItem("role") !== "admin") {
+      alert("Not authorised. Please log in again.");
+      window.location.href = "login_select.html";
+    }
+  }
+  ensureAdmin();
+
+  function saveStudents() {
+    localStorage.setItem("students", JSON.stringify(students));
+  }
+
+  function addOrUpdate() {
+    let username = document.getElementById("uName").value.trim();
+    let password = document.getElementById("uPass").value.trim();
+    let roll = parseInt(document.getElementById("roll").value);
+    let name = document.getElementById("name").value.trim();
+    let dept = document.getElementById("dept").value.trim();
+    let perf = parseInt(document.getElementById("perf").value);
+
+    if (!username || !password || !roll || !name || !dept || !perf) {
+      alert("Fill all fields!");
+      return;
+    }
+
+    let idx = students.findIndex(s => s.roll === roll);
+
+    if (idx >= 0) {
+      students[idx] = { username, password, roll, name, dept, perf };
+      alert("Student updated.");
+    } else {
+      students.push({ username, password, roll, name, dept, perf });
+      alert("Student added.");
+    }
+
+    saveStudents();
+    displayAll();
+  }
+
+  function searchStudent() {
+    let key = document.getElementById("searchKey").value.toLowerCase();
+    let results = students.filter(s =>
+      String(s.roll).includes(key) ||
+      s.name.toLowerCase().includes(key) ||
+      s.dept.toLowerCase().includes(key)
+    );
+
+    document.getElementById("searchResult").textContent =
+      results.length ? JSON.stringify(results) : "No results";
+  }
+
+  function deleteStudent() {
+    let roll = parseInt(document.getElementById("deleteRoll").value);
+    students = students.filter(s => s.roll !== roll);
+    saveStudents();
+    alert("Deleted (if existed).");
+    displayAll();
+  }
+
+  function displayAll() {
+    let body = document.getElementById("tableBody");
+    body.innerHTML = "";
+    students.forEach(s => {
+      body.innerHTML += `
+        <tr>
+          <td>${s.username}</td>
+          <td>${s.roll}</td>
+          <td>${s.name}</td>
+          <td>${s.dept}</td>
+          <td>${s.perf}%</td>
+        </tr>`;
+    });
+  }
+
+  function logout() {
+  
+  localStorage.removeItem("role");
+  localStorage.removeItem("studentUser");
+  localStorage.removeItem("teacherUser");
+  localStorage.removeItem("adminUser");
+  
+
+  window.location.href = "login_select.html";
+}
+
+
+  // initial table
+  displayAll();
+</script>
+
+</body>
+</html>

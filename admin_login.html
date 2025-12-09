@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Login</title>
+<script src="data.js"></script>
+
+<style>
+  body {
+    font-family: Poppins;
+    background: linear-gradient(135deg, #dbeafe, #93c5fd, #60a5fa);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card {
+    width: 350px;
+    padding: 30px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+
+  h2 {
+    text-align: center;
+    color: #1e3a8a;
+    font-weight: 700;
+  }
+
+  input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+
+  input {
+    border: 1px solid #93c5fd;
+    background: rgba(255,255,255,0.8);
+  }
+
+  button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Admin Login</h2>
+
+  <input id="adminUser" type="text" placeholder="Admin Username">
+  <input id="adminPass" type="password" placeholder="Password">
+
+  <button onclick="adminLogin()">Login</button>
+</div>
+
+<script>
+function adminLogin() {
+  let user = adminUser.value.trim();
+  let pass = adminPass.value.trim();
+
+  let a = admins.find(x => x.username === user && x.password === pass);
+  if (a) {
+    localStorage.setItem("role","admin");
+    window.location.href = "admin_dashboard.html";
+  } else {
+    alert("Invalid admin credentials!");
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Login</title>
+<script src="data.js"></script>
+
+<style>
+  body {
+    font-family: Poppins;
+    background: linear-gradient(135deg, #fef9c3, #fde047, #facc15);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card {
+    width: 350px;
+    padding: 30px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.35);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  }
+
+  h2 {
+    text-align: center;
+    color: #92400e;
+    font-weight: 700;
+  }
+
+  input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 10px;
+  }
+
+  input {
+    border: 1px solid #facc15;
+    background: rgba(255,255,255,0.85);
+  }
+
+  button {
+    background: #facc15;
+    color: black;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Student Login</h2>
+
+  <input id="studentUser" type="text" placeholder="Student Username">
+  <input id="studentPass" type="password" placeholder="Password">
+
+  <button onclick="studentLogin()">Login</button>
+</div>
+
+<script>
+function studentLogin() {
+  let user = studentUser.value.trim();
+  let pass = studentPass.value.trim();
+
+  let s = students.find(x => x.username === user && x.password === pass);
+  if (s) {
+    localStorage.setItem("role","student");
+    localStorage.setItem("studentUser", user);
+    window.location.href = "student_dashboard.html";
+  } else {
+    alert("Invalid student credentials!");
+  }
+}
+</script>
+
+</body>
+</html>
